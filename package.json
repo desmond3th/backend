@@ -5,8 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev" : "nodemon src/index.js",
-    "start": "node run index.js"
+    "dev" : "nodemon src/index.js"
   },
   "author": "saurabh kumar",
   "license": "ISC",
