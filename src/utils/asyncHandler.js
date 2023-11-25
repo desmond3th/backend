@@ -1,4 +1,6 @@
+// Wrapping synchronous and asynchronous route handlers with error handling.
 const asyncHandler = (reqHandler) => (
+    // Returning a middleware function that handles promises and catches errors.
     (req, res, next) => {
       Promise.resolve(reqHandler(req, res, next))
         .catch((err) => next(err));
