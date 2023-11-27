@@ -6,3 +6,5 @@ const regUser = asyncHandler( async (req, res) => {
         message: "ok"
     })
 })
+
+export { regUser }  
