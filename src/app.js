@@ -23,4 +23,7 @@ app.use("/api/v1/users", route)
 
 
 
+// use API testing tool like POSTMAN to verify if API is working.
+
+
 export { app }
