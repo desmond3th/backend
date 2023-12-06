@@ -1,4 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"; 
+import {ApiError} from "../utils/ApiError.js"
+import {User} from "../models/user.model.js"
+
 
 // Defining a route handler for registering a user wrapped with error handling
 const regUser = asyncHandler( async (req, res) => {
@@ -14,6 +17,22 @@ const regUser = asyncHandler( async (req, res) => {
 
 
     const {fullname, email, username, password} = req.body
+
+    const fields = [fullname, email, username, password];
+
+    for (const field of fields) {
+        if (!field || !field.trim()) {
+            throw new ApiError(400, "Empty fields are not acceptable");
+        }
+    }
+
+    const userExists = User.findOne(
+        { $or : [{ username }, { email }]
+    })
+
+    if (userExists) {
+        throw new ApiError(409, "User already exist")
+    }
     
 })
 
