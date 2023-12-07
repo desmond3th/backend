@@ -16,23 +16,26 @@ const regUser = asyncHandler( async (req, res) => {
     // return respone
 
 
-    const {fullname, email, username, password} = req.body
+    // Destructuring values from request body
+    const { fullname, email, username, password } = req.body;
 
     const fields = [fullname, email, username, password];
-
+    
+    // Checking for empty fields and throw error
     for (const field of fields) {
         if (!field || !field.trim()) {
             throw new ApiError(400, "Empty fields are not acceptable");
         }
     }
-
-    const userExists = User.findOne(
-        { $or : [{ username }, { email }]
-    })
-
-    if (userExists) {
-        throw new ApiError(409, "User already exist")
+    
+    // Checking if a user already exists with the provided email or username
+    const existingUserByEmail = await User.findOne({ email });
+    const existingUserByUsername = await User.findOne({ username });
+    
+    if (existingUserByEmail || existingUserByUsername) {
+        throw new ApiError(409, "User already exists");
     }
+    
     
 })
 
