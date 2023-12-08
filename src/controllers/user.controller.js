@@ -36,6 +36,18 @@ const regUser = asyncHandler( async (req, res) => {
         throw new ApiError(409, "User already exists");
     }
     
+
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is required");
+    }
+
+// Use coverImageLocalPath if available, otherwise use a default value (null or another fallback value)
+const finalCoverImageLocalPath = coverImageLocalPath ?? null;
+
+
     
 })
 
