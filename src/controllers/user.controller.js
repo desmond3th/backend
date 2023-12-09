@@ -71,12 +71,12 @@ const regUser = asyncHandler( async (req, res) => {
     }
     )
 
-    //search for user and remove passowrd and refresh token
+    //search for user and remove passowrd and refresh token (excluding sensitive information)
     const checkForUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
 
-    id(!checkForUser){
+    if(!checkForUser){
         throw new ApiError(500, "Couldn't register the user");
     }
 
