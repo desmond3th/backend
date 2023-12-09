@@ -54,7 +54,7 @@ const userSchema = new Schema (
 // Middleware: Hash the password before saving (pre-save hook)
 userSchema.pre("save", async function (next) {
     if(this.isModified("password")) {
-        this.password = bcrypt.hash(this.password, 8)
+        this.password = await bcrypt.hash(this.password, 8)
         next()
     }
     else{
