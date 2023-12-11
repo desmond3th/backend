@@ -26,46 +26,5 @@ const cloudinaryUpload = async (localPath) => {
 }
 
 
-// testing 
-
-const uploadFileToCloudinary = async (localPath) => {
-    if (!localPath) {
-        console.error("Local path is missing.");
-        return null;
-    }
-
-    try {
-        // Upload file to Cloudinary
-        const response = await cloudinary.uploader.upload(localPath, { resource_type: "auto" });
-
-        // Log success message with Cloudinary URL
-        console.log("File successfully uploaded to Cloudinary:", response.url);
-
-        // Return the Cloudinary response
-        return response;
-
-    } catch (uploadError) {
-        // Handle upload error
-        console.error("Error uploading file to Cloudinary:", uploadError);
-
-        try {
-            // Remove locally saved temp file if an error occurs during upload
-            fs.unlinkSync(localPath);
-            console.log("Local temp file removed.");
-        } catch (unlinkError) {
-            // Handle error during local file removal
-            console.error("Error removing local temp file:", unlinkError);
-        }
-
-        // Return null to indicate failure
-        return null;
-    }
-};
-
-// Example usage:
-const localFilePath = "/path/to/local/file.jpg";
-uploadFileToCloudinary(localFilePath);
-
-
 
 export { cloudinaryUpload }
