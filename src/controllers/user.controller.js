@@ -40,34 +40,38 @@ const regUser = asyncHandler( async (req, res) => {
     
 
     // handle the avatar and coverImage
-    const avatarLocalPath = req.files?.avatar?.[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+    const avatarLocalPath = req.files?.avatar[0]?.path;
 
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required");
+        throw new ApiError(400, "Avatar file is required!");
     }
     
-
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
 
     //upload both on cloudinary
     const avatar = await cloudinaryUpload(avatarLocalPath)
-    const coverImage = await cloudinaryUpload(coverImageLocalPath)
+    // console.log('Avatar upload response:', avatar);
 
-        // Use coverImageLocalPath if uploaded, otherwise use a null value
-    const finalCoverImage = coverImage ?? "";
+    const coverImage = await cloudinaryUpload(coverImageLocalPath)
+    // console.log('Cover image upload response:', coverImage);
+
 
 
     if(!avatar) {
-        throw new ApiError(400, "Avatar file is required");
+        throw new ApiError(400, "Avatar file upload failed!");
     }
 
 
     const user = await User.create({
         fullname,
         avatar: avatar.url,
-        coverImage: finalCoverImage,
+        coverImage:  coverImage?.url || "", // Use coverImageLocalPath if uploaded, otherwise use a null value
         username : username.toLowerCase(),
         password,
+        email
     }
     )
 
