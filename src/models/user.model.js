@@ -53,14 +53,17 @@ const userSchema = new Schema (
 
 // Middleware: Hash the password before saving (pre-save hook)
 userSchema.pre("save", async function (next) {
-    if(this.isModified("password")) {
-        this.password = await bcrypt.hash(this.password, 8)
-        next()
+    try {
+        if(this.isModified("password")) {
+            this.password = await bcrypt.hash(this.password, 8);
+            next();
+        } else {
+            next();
+        }
+    } catch (error) {
+        next(error);
     }
-    else{
-        next()
-    }
-})
+});
 
 // Method: Check if a given password is correct
 userSchema.methods.isPasswordCorrect = async function (password)
@@ -85,7 +88,7 @@ userSchema.methods.generateAccessToken = async function() {
 }
 
 // Method: Generate a refresh token
-userSchema.methods.generateRefreshToken = function() {
+userSchema.methods.generateRefreshToken = async function() {
     return Jwt.sign(
         {
             _id: this._id
