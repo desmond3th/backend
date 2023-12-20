@@ -7,10 +7,13 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 /** method for generating access and refresh token **/
 const generateAccessAndRefreshTokens = async (userId) => {
+
     try{
         const user = await User.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+        
+      //  console.log(accessToken, refreshToken)
 
         user.refreshToken = refreshToken
         await user.save( {validateBeforeSave : false} )
@@ -45,7 +48,6 @@ const regUser = asyncHandler( async (req, res) => {
     if (existingUserByEmail || existingUserByUsername) {
         throw new ApiError(409, "User already exists");
     }
-    
 
     // handle the avatar and coverImage
     const avatarLocalPath = req.files?.avatar[0]?.path;
@@ -106,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const {username, email, password} = req.body
 
     // login with username or email
-    if(!email || !username) {
+    if(!email && !username) {
         throw new ApiError(400, "One of the field is required")
     }
 
