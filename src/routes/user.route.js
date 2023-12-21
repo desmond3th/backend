@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, logoutUser, regUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, regUser, refreshAccessToken } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -19,9 +19,9 @@ route.route("/register").post(
     ]),
     regUser) // make sure to send the POST status.
 
-
 route.route("/login").post(loginUser)
 
 route.route("/logout").post(verifyJWT, logoutUser)
+route.route("/refresh-token").post(refreshAccessToken)
 
 export default route
