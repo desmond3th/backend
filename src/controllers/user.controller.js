@@ -302,6 +302,17 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar file upload failed!");
     }
 
+    // Get the old avatar URL from the user data
+    const oldImageUrl = user.avatar;
+
+    // Delete the old avatar image
+    const oldImageDeleted = await cloudinaryDelete(oldImageUrl);
+    
+    // Check if the old avatar deletion was successful
+    if (!oldImageDeleted) {
+        throw new ApiError(500, "Failed to delete old avatar image.");
+    }
+
     // Update the user's avatar URL in the database
     const user = await User.findByIdAndUpdate(req.user?._id, 
         {
@@ -333,6 +344,16 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     if(!coverImage.url) {
         throw new ApiError(400, "Avatar file upload failed!");
+    }
+
+    // Get the old cover URL from the user data
+    const oldImageUrl = user.coverImage;
+
+    // Delete the old cover image
+    const oldImageDeleted = await cloudinaryDelete(oldImageUrl);
+        
+    if (!oldImageDeleted) {
+        throw new ApiError(500, "Failed to delete old avatar image.");
     }
 
     // Update the user's coverImage URL in the database
