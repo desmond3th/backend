@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.model.js"
-import {cloudinaryUpload} from "../utils/cloudinary.js"
+import {cloudinaryUpload, cloudinaryDelete} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 
@@ -13,9 +13,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         const user = await User.findById(userId)
         const accessToken = await user.generateAccessToken();
         const refreshToken = await user.generateRefreshToken();
-        
-      //  console.log(accessToken, refreshToken)
-
+    
         user.refreshToken = refreshToken
         await user.save( {validateBeforeSave : false} )
 
@@ -185,6 +183,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 
 /*** Route handler for refreshing the access token using a valid refresh token ****/
+
+//TEST AND DEBUG
 const refreshAccessToken = asyncHandler(async (req, res) => {
 
     // Extract refresh token from cookies or request body
@@ -202,13 +202,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Refresh Token Invalid")
     }
 
+     console.log("Incoming Refresh Token:", incomingRefreshToken);
+     console.log("Stored Refresh Token:", user.refreshToken);
+
+
     // Check if the stored refresh token matches the incoming refresh token
-    if(user?.refreshToken !== incomingRefreshToken){
-        throw new ApiError(401, "Expired refresh token")
+    if(user?.refreshToken.trim() !== incomingRefreshToken.trim()){
+        throw new ApiError(401, "Expired refresh token or invalid")
     }
 
     // Generate new access and refresh tokens for the user
-    const [accessToken, newRefreshToken] = await generateAccessAndRefreshTokens(user._id)
+    const {accessToken, newRefreshToken} = await generateAccessAndRefreshTokens(user._id)
 
     const options = {
         httpOnly: true,
@@ -217,7 +221,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     // Set the new access and refresh tokens as cookies in the response
     return res
-    .statusCode = 200
+    .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", newRefreshToken, options)
     .json( new ApiResponse(
@@ -234,7 +238,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 /***Route hanlder for changing password ***/
 const changePassword = asyncHandler(async(req, res) => {
 
-    const [oldPassword, newPassword] = req.body
+    const {oldPassword, newPassword} = req.body
 
     const user = await User.findById(req.user?._id)
 
@@ -264,16 +268,16 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 /*** Route handler for updating user details ***/
 const updateUserDetails = asyncHandler(async (req, res) => {
     
-    const [fullName, email] = req.body
+    const {fullname, email} = req.body
     
-    if(!fullName || !email) {
+    if(!fullname && !email) {
         throw new ApiError(400, "One of the field is required")
     }
 
     const user = await User.findByIdAndUpdate(req.user?._id, 
         {
             $set: {
-                fullName, 
+                fullname, 
                 email
             }
         }, {new: true})
@@ -286,6 +290,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
 
 /*** Route handler for Updating Avatar ***/
+// TEST AND DBUG
 const updateUserAvatar = asyncHandler(async (req, res) => {
 
     // get the local path of uploaded avatar
@@ -303,7 +308,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     }
 
     // Get the old avatar URL from the user data
-    const oldImageUrl = user.avatar;
+    const oldImageUrl = req.user.avatar;
+    console.log(oldImageUrl)
 
     // Delete the old avatar image
     const oldImageDeleted = await cloudinaryDelete(oldImageUrl);
@@ -330,6 +336,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
 
 /*** Route handler for Updating Cover Image ***/
+// TEST AND DEBUG
 const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     //get the local path of uploaded cover image
@@ -347,7 +354,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     }
 
     // Get the old cover URL from the user data
-    const oldImageUrl = user.coverImage;
+    const oldImageUrl = req.user.coverImage;
 
     // Delete the old cover image
     const oldImageDeleted = await cloudinaryDelete(oldImageUrl);
@@ -375,7 +382,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 /*** Route handler for getting channel details***/
 const userChannelProfile = asyncHandler(async (req, res) => {
 
-    const [username] = req.params
+    const {username} = req.params
 
     if(!username.trim()) {
         throw new ApiError(400, "Username is required")
@@ -400,7 +407,7 @@ const userChannelProfile = asyncHandler(async (req, res) => {
             // total channel subscribed to
             $lookup: {
                 from: "subscriptions", // from Subscription model
-                localfield: "_id",
+                localField: "_id",
                 foreignField: "subscriber",
                 as: "subscribedChannel"
             }
@@ -427,7 +434,7 @@ const userChannelProfile = asyncHandler(async (req, res) => {
         {
             $project: {
                 username: 1,
-                fullName: 1,
+                fullname: 1,
                 email: 1,
                 avatar: 1,
                 coverImage: 1,
@@ -437,6 +444,8 @@ const userChannelProfile = asyncHandler(async (req, res) => {
             }
         }
     ])
+
+    console.log(channelInfo)
 
     if(!channelInfo?.length){
         throw new ApiError(404, "channel not found")

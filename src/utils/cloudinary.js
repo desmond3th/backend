@@ -41,18 +41,16 @@ const cloudinaryDelete = async (oldImageUrl) => {
         try {
             // Delete the old image from Cloudinary using the URL
             const deletionResult = await cloudinary.uploader.destroy(oldImageUrl);
+           console.log(deletionResult)
 
             if (deletionResult.result !== 'ok') {
-                //console.error("Failed to delete the old image");
                 return false;
             }
 
             // If the deletion was successful
-           // console.log("Old image deleted successfully:", oldImageUrl);
+            // console.log("Old image deleted successfully:", oldImageUrl);
             return true;
-            
         } catch (error) {
-           // console.error("Error while deleting the old image:", error);
             return false;
         }
     }
@@ -60,6 +58,7 @@ const cloudinaryDelete = async (oldImageUrl) => {
     // If no old image URL is provided, consider it as successfully deleted
     return true;
 };
+
 
 
 export { cloudinaryUpload, cloudinaryDelete }
