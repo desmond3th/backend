@@ -377,7 +377,7 @@ const userChannelProfile = asyncHandler(async (req, res) => {
 
     const [username] = req.params
 
-    if(!username) {
+    if(!username.trim()) {
         throw new ApiError(400, "Username is required")
     }
 
@@ -447,4 +447,5 @@ export { loginUser,
         getCurrentUser,
         updateUserDetails,
         updateUserAvatar,
-        updateUserCoverImage}  
+        updateUserCoverImage, 
+        userChannelProfile}  
