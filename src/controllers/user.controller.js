@@ -371,6 +371,74 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     ) 
 })
 
+
+/*** Route handler for getting channel details***/
+const userChannelProfile = asyncHandler(async (req, res) => {
+
+    const [username] = req.params
+
+    if(!username) {
+        throw new ApiError(400, "Username is required")
+    }
+
+    const channelInfo = await User.aggregate([
+        {
+            $match: {
+                username : username?.toLowerCase()
+            }
+        }, 
+        {
+            // getting total subscibers
+            $lookup: {
+                from: "subscriptions", // from Subscription model
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
+        }, 
+        {
+            // total channel subscribed to
+            $lookup: {
+                from: "subscriptions", // from Subscription model
+                localfield: "_id",
+                foreignField: "subscriber",
+                as: "subscribedChannel"
+            }
+        },
+        {
+            $addFields: {
+                subscriberCount: {
+                    $size: "$subscribers"
+                },
+                subscribedChannelCount: {
+                    $size: "$subscribedChannel"
+                },
+                subscribedStatus: {
+                    $cond: {
+                        if: { 
+                            $in: [req.user?._id, "$subscribers.subscriber"]
+                        },
+                        then: false,
+                        else: true
+                    }
+                }
+            }
+        }, 
+        {
+            $project: {
+                username: 1,
+                fullName: 1,
+                email: 1,
+                avatar: 1,
+                coverImage: 1,
+                subscriberCount: 1,
+                subscribedChannelCount: 1,
+                subscribedStatus: 1
+            }
+        }
+    ])
+})
+
 export { loginUser,
         regUser,
         logoutUser, 
@@ -379,4 +447,4 @@ export { loginUser,
         getCurrentUser,
         updateUserDetails,
         updateUserAvatar,
-        updateUserCoverImage }  
+        updateUserCoverImage}  

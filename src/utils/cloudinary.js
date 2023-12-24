@@ -35,6 +35,7 @@ const cloudinaryUpload = async (localPath) => {
     }
 };
 
+// deleting files on cloudinary
 const cloudinaryDelete = async (oldImageUrl) => {
     if (oldImageUrl) {
         try {
