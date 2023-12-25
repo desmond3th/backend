@@ -290,7 +290,6 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
 
 /*** Route handler for Updating Avatar ***/
-// TEST AND DBUG
 const updateUserAvatar = asyncHandler(async (req, res) => {
 
     // get the local path of uploaded avatar
@@ -309,7 +308,6 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     // Get the old avatar URL from the user data
     const oldImageUrl = req.user.avatar;
-    console.log(oldImageUrl)
 
     // Delete the old avatar image
     const oldImageDeleted = await cloudinaryDelete(oldImageUrl);
@@ -336,7 +334,6 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
 
 /*** Route handler for Updating Cover Image ***/
-// TEST AND DEBUG
 const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     //get the local path of uploaded cover image

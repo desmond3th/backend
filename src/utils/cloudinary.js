@@ -26,7 +26,6 @@ const cloudinaryUpload = async (localPath) => {
 
         try {
             fs.unlinkSync(localPath);
-            // console.log('Local file deleted successfully.');
         } catch (deleteErr) {
             // console.error('Error deleting local file:', deleteErr);
         }
@@ -35,30 +34,51 @@ const cloudinaryUpload = async (localPath) => {
     }
 };
 
+// Extracting publicId from cloudinary URL
+const extractPublicIdFromUrl = (imageUrl) => {
+    try {
+        const pathParts = imageUrl.split('/upload/');
+        if (pathParts.length === 2) {
+            // Split the second part by '/' and exclude the first component (version)
+            const publicIdParts = pathParts[1].split('/').slice(1);
+            
+            // Remove file extension (.jpg)
+            const publicId = publicIdParts.join('/').replace(/\.[^/.]+$/, '');
+
+            return publicId;
+        }
+        return null;
+    } catch (error) {
+        return null;
+    }
+};
+
+
 // deleting files on cloudinary
 const cloudinaryDelete = async (oldImageUrl) => {
     if (oldImageUrl) {
         try {
-            // Delete the old image from Cloudinary using the URL
-            const deletionResult = await cloudinary.uploader.destroy(oldImageUrl);
-           console.log(deletionResult)
+
+            const publicId = extractPublicIdFromUrl(oldImageUrl);
+            //console.log("Public Id:",publicId)
+            
+            const deletionResult = await cloudinary.uploader.destroy(publicId);
+            //console.log(deletionResult)
 
             if (deletionResult.result !== 'ok') {
                 return false;
             }
 
             // If the deletion was successful
-            // console.log("Old image deleted successfully:", oldImageUrl);
             return true;
+
         } catch (error) {
             return false;
         }
     }
-
     // If no old image URL is provided, consider it as successfully deleted
     return true;
 };
-
 
 
 export { cloudinaryUpload, cloudinaryDelete }
