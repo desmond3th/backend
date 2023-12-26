@@ -31,6 +31,6 @@ route.route("/update-account").patch(verifyJWT, updateUserDetails)
 route.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
 route.route("/cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 route.route("/c/:username").get(verifyJWT, userChannelProfile)
-route.route("watch-history").get(verifyJWT, getWatchHistory)
+route.route("/watch-history").get(verifyJWT, getWatchHistory)
 
 export default route
