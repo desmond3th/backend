@@ -466,6 +466,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             }
         },
         {
+            // Lookup to get video details from the 'videos' collection based on watchHistory
             $lookup: {
                 from: "videos",
                 localField: "watchHistory",
@@ -473,6 +474,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                 as: "watchHistory",
                 pipeline: [
                     {
+                        // Nested lookup to retrieve owner details from the 'users' collection
                         $lookup: {
                             from: "users",
                             localField: "owner",
@@ -480,6 +482,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                             as: "owner",
                             pipeline: [
                                 {
+                                    // Projecting relevant owner fields
                                     $project: {
                                         fullName: 1,
                                         username: 1,
@@ -490,6 +493,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                         }
                     },
                     {
+                        // Adding a new field 'owner' by extracting the first element from the 'owner' array
                         $addFields:{
                             owner:{
                                 $arrayElemAt: ["$owner", 0]
@@ -511,6 +515,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         )
     )
 })
+
 
 export { loginUser,
         regUser,
