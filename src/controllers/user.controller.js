@@ -517,6 +517,28 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for deleting user channel ***/
+const deleteUserChannel = asyncHandler(async (req, res) => {
+    
+    const userId = req.user?._id;
+
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized");
+    }
+
+    // Delete the user channel and related data
+    const deletionResult = await User.deleteOne({ _id: userId });
+
+    if (deletionResult.deletedCount === 0) {
+        throw new ApiError(404, "User channel not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "User channel deleted successfully")
+    );
+});
+
+
 export { loginUser,
         regUser,
         logoutUser, 
