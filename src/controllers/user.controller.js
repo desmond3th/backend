@@ -549,4 +549,5 @@ export { loginUser,
         updateUserAvatar,
         updateUserCoverImage, 
         userChannelProfile,
-        getWatchHistory}  
+        getWatchHistory,
+        deleteUserChannel}  
