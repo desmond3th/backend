@@ -539,6 +539,27 @@ const deleteUserChannel = asyncHandler(async (req, res) => {
 });
 
 
+/*** Route handler for uploading video ***/
+const uploadVideo = asyncHandler(async (req, res) => {
+    
+    const videoFilePath = req.files.video[0]?.path;
+
+    // check if a video file is present in the request
+    if (videoFilePath) {
+        throw new ApiError(400, "Video file is required!");
+    }
+
+    // upload video file to Cloudinary
+    const videoCloudinaryResponse = await cloudinaryUpload(videoFilePath);
+   //  console.log(videoCloudinaryResponse)
+
+    if (!videoCloudinaryResponse.url) {
+        throw new ApiError(500, "Video upload failed!");
+    }
+
+});
+
+
 export { loginUser,
         regUser,
         logoutUser, 
