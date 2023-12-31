@@ -557,6 +557,17 @@ const uploadVideo = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Video upload failed!");
     }
 
+    const thumbnailFilePath = req.files.thumbnail[0]?.path;
+
+    if (!thumbnailFilePath) {
+        throw new ApiError(400, "Thumbnail file is required!");
+    }
+    // Upload video thumbnail to Cloudinary
+    const thumbnailCloudinaryResponse = await cloudinaryUpload(thumbnailFilePath);
+
+    if (!thumbnailCloudinaryResponse || !thumbnailCloudinaryResponse.url) {
+        throw new ApiError(500, "Thumbnail upload failed!");
+    }
 });
 
 
