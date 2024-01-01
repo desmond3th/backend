@@ -567,7 +567,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
     if (!thumbnailCloudinaryResponse || !thumbnailCloudinaryResponse.url) {
         throw new ApiError(500, "Thumbnail upload failed!");
-    }
+    } 
 });
 
 
@@ -582,4 +582,5 @@ export { loginUser,
         updateUserCoverImage, 
         userChannelProfile,
         getWatchHistory,
-        deleteUserChannel}  
+        deleteUserChannel,
+        uploadVideo}  
