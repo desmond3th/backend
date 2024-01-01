@@ -542,7 +542,7 @@ const deleteUserChannel = asyncHandler(async (req, res) => {
 /*** Route handler for uploading video ***/
 const uploadVideo = asyncHandler(async (req, res) => {
     
-    const videoFilePath = req.files.video[0]?.path;
+    const videoFilePath = req.files.videoFile[0]?.path;
 
     // check if a video file is present in the request
     if (videoFilePath) {
@@ -562,12 +562,14 @@ const uploadVideo = asyncHandler(async (req, res) => {
     if (!thumbnailFilePath) {
         throw new ApiError(400, "Thumbnail file is required!");
     }
+    
     // Upload video thumbnail to Cloudinary
     const thumbnailCloudinaryResponse = await cloudinaryUpload(thumbnailFilePath);
 
     if (!thumbnailCloudinaryResponse || !thumbnailCloudinaryResponse.url) {
         throw new ApiError(500, "Thumbnail upload failed!");
     } 
+
 });
 
 
