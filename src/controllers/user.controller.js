@@ -582,6 +582,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
         description: req.body.description || "",
         duration: req.body.duration || 0,
         title: req.body.title || "",
+        owner: req.user._id
     });
 
     const savedVideo = await newVideo.save();
