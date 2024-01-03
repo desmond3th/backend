@@ -574,7 +574,21 @@ const uploadVideo = asyncHandler(async (req, res) => {
         await cloudinaryDelete(videoCloudinaryResponse.url);
         throw new ApiError(500, "Thumbnail upload failed!");
     } 
-    
+
+    // Create a new video document in the database
+    const newVideo = new Video({
+        videoFile: videoCloudinaryResponse.url,
+        thumbnail: thumbnailCloudinaryResponse.url,
+        description: req.body.description || "",
+        duration: req.body.duration || 0,
+        title: req.body.title || "",
+    });
+
+    const savedVideo = await newVideo.save();
+
+    return res.status(201).json( 
+        new ApiResponse(200, savedVideo, "Video uploaded successfully"))
+
 });
 
 
