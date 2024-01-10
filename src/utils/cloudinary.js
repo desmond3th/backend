@@ -34,19 +34,24 @@ const cloudinaryUpload = async (localPath) => {
     }
 };
 
-// Extracting publicId from cloudinary URL
-const extractPublicIdFromUrl = (imageUrl) => {
+// Extracting publicId from Cloudinary URL
+const extractPublicIdFromUrl = (resourceUrl) => {
     try {
-        const pathParts = imageUrl.split('/upload/');
-        if (pathParts.length === 2) {
-            // Split the second part by '/' and exclude the first component (version)
-            const publicIdParts = pathParts[1].split('/').slice(1);
-            
-            // Remove file extension (.jpg)
+        const pathParts = resourceUrl.split('/');
+
+        // Find the index of 'upload' in the path
+        const uploadIndex = pathParts.indexOf('upload');
+
+        if (uploadIndex !== -1 && uploadIndex < pathParts.length - 1) {
+            // remove the 'upload' component and the version
+            const publicIdParts = pathParts.slice(uploadIndex + 1, -1);
+
+            // join the remaining parts to form the publicId and remove extension
             const publicId = publicIdParts.join('/').replace(/\.[^/.]+$/, '');
 
             return publicId;
         }
+        
         return null;
     } catch (error) {
         return null;
@@ -54,12 +59,13 @@ const extractPublicIdFromUrl = (imageUrl) => {
 };
 
 
+
 // deleting files on cloudinary
-const cloudinaryDelete = async (oldImageUrl) => {
-    if (oldImageUrl) {
+const cloudinaryDelete = async (resourceUrl) => {
+    if (resourceUrl) {
         try {
 
-            const publicId = extractPublicIdFromUrl(oldImageUrl);
+            const publicId = extractPublicIdFromUrl(resourceUrl);
             //console.log("Public Id:",publicId)
             
             const deletionResult = await cloudinary.uploader.destroy(publicId);
