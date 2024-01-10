@@ -13,6 +13,11 @@ const publishVideo = asyncHandler(async (req, res) => {
     if (!req.files || !req.files.videoFile || !req.files.thumbnail) {
         throw new ApiError(400, "Both video file and thumbnail are required!");
     }
+    
+    const { title, description } = req.body;
+    if (!title || !description) {
+        throw new ApiError(400, "Both title and description are required!");
+    }
 
     // For Video
     const videoFilePath = req.files.videoFile[0]?.path;
