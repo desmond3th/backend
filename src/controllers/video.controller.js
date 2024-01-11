@@ -108,8 +108,41 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 
+const updateVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const { title, description} = req.body
+
+    const thumbnailFilePath = req.file?.path
+
+    if (!thumbnailFilePath) {
+        throw new ApiError(400, "Thumbnail file is required!");
+    }
+
+    const uploadThumbnail = await cloudinaryUpload(thumbnailFilePath);
+
+    if (!uploadThumbnail || !uploadThumbnail.url) {
+        throw new ApiError(500, "Thumbnail upload failed!");
+    } 
+
+    const video = await Video.findByIdAndUpdate(videoId,
+        {
+            $set: {
+                title: title,
+                thumbnail: uploadThumbnail.url,
+                description: description
+            }
+        }, {new: true})
+
+    return res.status(200)
+    .json( 
+        new ApiResponse(200, video, "Video updated successfully")
+    ) 
+})
+
 export {
     publishVideo, 
     deleteVideo, 
-    getVideoById
+    getVideoById,
+    updateVideo
 }
