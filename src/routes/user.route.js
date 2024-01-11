@@ -33,7 +33,7 @@ route.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvata
 route.route("/cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 route.route("/c/:username").get(verifyJWT, userChannelProfile)
 route.route("/watch-history").get(verifyJWT, getWatchHistory)
-route.route("/delete").post(verifyJWT, deleteUserChannel)
+route.route("/delete").delete(verifyJWT, deleteUserChannel)
 
 
 export default route
