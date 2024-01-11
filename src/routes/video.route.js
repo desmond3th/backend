@@ -21,3 +21,4 @@ route.route("/publish").post(
 
 route.route("/delete-video/:videoId").delete(deleteVideo);
 route.route("/get-video/:videoId").get(getVideoById);
+route.route("/update-video/:videoId").patch(upload.single("thumbnail"), updateVideo);
