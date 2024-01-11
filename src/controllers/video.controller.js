@@ -92,6 +92,24 @@ const deleteVideo = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for accessing a video ***/
+const getVideoById = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const videoResult = await Video.findById(videoId)
+
+    if (!videoResult) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, videoResult, "video fetched successfully")
+    )
+})
+
+
 export {
-    publishVideo, deleteVideo
+    publishVideo, 
+    deleteVideo, 
+    getVideoById
 }
