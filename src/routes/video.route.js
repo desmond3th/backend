@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {publishVideo} from "../controllers/video.controller.js"
+import {publishVideo, deleteVideo} from "../controllers/video.controller.js"
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -18,3 +18,5 @@ route.route("/publish").post(
             maxCount: 1
         }
     ]), publishVideo )
+
+    route.route("/delete-video/:videoId").delete(deleteVideo);
