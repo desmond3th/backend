@@ -4,7 +4,7 @@ import {User} from "src/models/user.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import {cloudinaryUpload} from "../utils/cloudinaryUpload.js"
+import {cloudinaryUpload, cloudinaryDelete} from "../utils/cloudinaryUpload.js"
 
 
 /*** Route handler for uploading video ***/
@@ -65,6 +65,33 @@ const publishVideo = asyncHandler(async (req, res) => {
 });
 
 
+/*** Route handler for deleting video ***/
+const deleteVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const videoResult = await Video.findById(videoId)
+
+    if(!videoResult){
+        throw new ApiError(404, "Couldn't find video")
+    }
+
+    const videoURL = videoResult.videoFile; 
+
+    const deletionResult = await cloudinaryDelete(videoURL);
+
+    if(!deletionResult) {
+        throw new ApiError(500, "Video deletion failed")
+    }
+
+    await Video.deleteOne({ _id: videoId });
+
+    return res.status(200).json(
+        new ApiResponse(200, null, "Video deleted successfully")
+    )
+
+})
+
+
 export {
-    publishVideo
+    publishVideo, deleteVideo
 }
