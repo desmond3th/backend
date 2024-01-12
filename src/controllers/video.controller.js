@@ -146,9 +146,31 @@ const updateVideo = asyncHandler(async (req, res) => {
             .json( 
                 new ApiResponse(200, video, "Video updated successfully")
             ) 
-            
+
     } catch (error) {
         throw new ApiError(401, error?.message || "Video update failed");
+    }
+})
+
+
+/*** Route handler for toggling publish status of a video ***/
+const togglePublishStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    // Toggle the publish status
+    video.isPublished = !video.isPublished;
+
+    try {
+        const updatedVideo = await video.save();
+        return res.status(200).json(new ApiResponse(200, updatedVideo, "Published status updated successfully"));
+    } catch (error) {
+        throw new ApiError(500, "Error updating published status");
     }
 })
 
@@ -156,5 +178,6 @@ export {
     publishVideo, 
     deleteVideo, 
     getVideoById,
-    updateVideo
+    updateVideo,
+    togglePublishStatus
 }
