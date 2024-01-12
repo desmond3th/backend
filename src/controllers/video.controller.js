@@ -108,36 +108,48 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for updating a video ***/
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
 
-    const { title, description} = req.body
-
-    const thumbnailFilePath = req.file?.path
-
-    if (!thumbnailFilePath) {
-        throw new ApiError(400, "Thumbnail file is required!");
-    }
-
-    const uploadThumbnail = await cloudinaryUpload(thumbnailFilePath);
-
-    if (!uploadThumbnail || !uploadThumbnail.url) {
-        throw new ApiError(500, "Thumbnail upload failed!");
-    } 
-
-    const video = await Video.findByIdAndUpdate(videoId,
-        {
-            $set: {
-                title: title,
-                thumbnail: uploadThumbnail.url,
-                description: description
+    try {
+            const { videoId } = req.params
+            const { title, description} = req.body
+            const thumbnailFilePath = req.file?.path
+    
+            if (!thumbnailFilePath) {
+                throw new ApiError(400, "Thumbnail file is missing!");
             }
-        }, {new: true})
-
-    return res.status(200)
-    .json( 
-        new ApiResponse(200, video, "Video updated successfully")
-    ) 
+    
+            const uploadThumbnail = await cloudinaryUpload(thumbnailFilePath);
+    
+            if (!uploadThumbnail || !uploadThumbnail.url) {
+                throw new ApiError(500, "Thumbnail upload failed!");
+            } 
+    
+            const existingVideo = await Video.findById(videoId);
+            const oldThumbnailURL = existingVideo.thumbnail;
+    
+            if (oldThumbnailURL) {
+                await cloudinaryDelete(oldThumbnailURL);
+            }
+    
+            const video = await Video.findByIdAndUpdate(videoId,
+                {
+                    $set: {
+                        title: title || "",
+                        thumbnail: uploadThumbnail.url,
+                        description: description || ""
+                    }
+                }, {new: true})
+    
+            return res.status(200)
+            .json( 
+                new ApiResponse(200, video, "Video updated successfully")
+            ) 
+            
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Video update failed");
+    }
 })
 
 export {
