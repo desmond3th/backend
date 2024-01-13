@@ -24,3 +24,5 @@ route.route("/get-video/:videoId").get(getVideoById);
 route.route("/update-video/:videoId").patch(upload.single("thumbnail"), updateVideo);
 route.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 route.route("/get-video").get(getAllVideos)
+
+export default route
