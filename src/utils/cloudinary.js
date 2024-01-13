@@ -36,7 +36,6 @@ const cloudinaryUpload = async (localPath) => {
 
 // Extracting publicId from Cloudinary URL
 const extractPublicIdFromUrl = (resourceUrl) => {
-    try {
         const pathParts = resourceUrl.split('/');
 
         // Find the index of 'upload' in the path
@@ -51,11 +50,6 @@ const extractPublicIdFromUrl = (resourceUrl) => {
 
             return publicId;
         }
-        
-        return null;
-    } catch (error) {
-        return null;
-    }
 };
 
 
@@ -66,16 +60,12 @@ const cloudinaryDelete = async (resourceUrl) => {
         try {
 
             const publicId = extractPublicIdFromUrl(resourceUrl);
-            //console.log("Public Id:",publicId)
-            
             const deletionResult = await cloudinary.uploader.destroy(publicId);
-            //console.log(deletionResult)
 
             if (deletionResult.result !== 'ok') {
                 return false;
             }
 
-            // If the deletion was successful
             return true;
 
         } catch (error) {
