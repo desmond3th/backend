@@ -179,56 +179,41 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
 
-    // Validate page and limit are non-negative integers
-    const validatedPage = parseInt(page) >= 0 ? parseInt(page) : 1;
-    const validatedLimit = parseInt(limit) >= 0 ? parseInt(limit) : 10;
+    const options = {
+        page: parseInt(page),
+        limit: parseInt(limit),
+    };
 
-    // total videos based on the query
-    const totalVideos = await Video.countDocuments({
-        $or: [
-            query ? { title: { $regex: new RegExp(query, 'i') } } : {},
-            userId ? { owner: userId } : {},
-        ],
-    });
+    const result = await Video.aggregatePaginate(
+        [
+            { 
+                $match: {
+                    $or: [
+                        query ? { title: { $regex: new RegExp(query, 'i') } } : {},
+                        userId ? { owner: userId } : {},
+                    ],
+                }
+            },
+            { 
+                $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 },
+            }
 
-    const videos = await Video.aggregate([
-        {
-            $match: {
-                $and: [
-                    query ? { title: { $regex: new RegExp(query, 'i') } } : {},
-                    userId ? { owner: userId } : {},
-                ],
-            },
-        },
-        {
-            $sort: {
-                [sortBy]: sortType === 'asc' ? 1 : -1,
-            },
-        },
-        {
-            $skip: (validatedPage - 1) * validatedLimit,
-        },
-        {
-            $limit: validatedLimit,
-        },
-        {
-            $addFields: {
-                totalPages: {
-                    $ceil: {
-                        $divide: [totalVideos, validatedLimit],
-                    },
-                },
-            },
-        },
-    ]);
+        ], options);
 
     res.status(200).json(
         new ApiResponse(
             200,
-            videos,
+            {
+                currentPage: result.page,
+                totalPages: result.totalPages,
+                totalResults: result.totalDocs,
+                nextPage: result.hasNextPage ? result.nextPage : null,
+                videos: result.docs,
+            },
             "Videos fetched successfully"
         )
-    );
+    )
+    
 });
 
 
