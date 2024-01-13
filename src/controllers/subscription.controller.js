@@ -43,6 +43,44 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 })
 
 
+const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+    const { channelId } = req.params;
+
+    const subscribers = await Subscription.aggregate([
+        {
+            $match: { channel: mongoose.Types.ObjectId(channelId) }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'subscriber',
+                foreignField: '_id',
+                as: 'subscriberDetails'
+            }
+        },
+        {
+            $unwind: '$subscriberDetails'
+        },
+        {
+            $project: {
+                subscriber: {
+                    username: 1,
+                    fullname: 1,
+                    avatar: 1
+                }
+            }
+        }
+    ])
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, subscribers, "Subscriber list fetched successfully")
+    )
+    
+})
+
+
 export {
     toggleSubscription,
+    getUserChannelSubscribers
 }
