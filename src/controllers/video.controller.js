@@ -175,44 +175,48 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 })
 
 
-
+/*** Route handler for accessing all the videos based on queries ***/
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
 
-    const options = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-    };
-
-    const result = await Video.aggregatePaginate(
-        [
-            { 
-                $match: {
-                    $or: [
-                        query ? { title: { $regex: new RegExp(query, 'i') } } : {},
-                        userId ? { owner: userId } : {},
-                    ],
-                }
-            },
-            { 
-                $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 },
-            }
-
-        ], options);
-
-    res.status(200).json(
-        new ApiResponse(
-            200,
-            {
-                currentPage: result.page,
-                totalPages: result.totalPages,
-                totalResults: result.totalDocs,
-                nextPage: result.hasNextPage ? result.nextPage : null,
-                videos: result.docs,
-            },
-            "Videos fetched successfully"
-        )
-    )
+    try {
+            const options = {
+                page: parseInt(page),
+                limit: parseInt(limit),
+            };
+        
+            const result = await Video.aggregatePaginate(
+                [
+                    { 
+                        $match: {
+                            $or: [
+                                query ? { title: { $regex: new RegExp(query, 'i') } } : {},
+                                userId ? { owner: userId } : {},
+                            ],
+                        }
+                    },
+                    { 
+                        $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 },
+                    }
+        
+                ], options);
+        
+            res.status(200).json(
+                new ApiResponse(
+                    200,
+                    {
+                        currentPage: result.page,
+                        totalPages: result.totalPages,
+                        totalResults: result.totalDocs,
+                        nextPage: result.hasNextPage ? result.nextPage : null,
+                        videos: result.docs,
+                    },
+                    "Videos fetched successfully"
+                )
+            )
+    } catch (error) {
+        throw new ApiError(500, error?.message || "Error fetching videos") 
+    }
     
 });
 
