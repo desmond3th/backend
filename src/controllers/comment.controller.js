@@ -48,5 +48,33 @@ const getVideoComments = asyncHandler(async (req, res) => {
     )
 })
 
+
+/*** Route handler for adding comment for a video ***/
+const addComment = asyncHandler(async (req, res) => {
+    const {videoId} = req.params
+    const {content} = req.body
+    const userId = req.user._id
+
+    const video = await getVideoById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    const comment = await Comment.create({
+        content,
+        video: videoId,
+        owner: userId
+    })
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, comment, "Comment posted successfully")
+    )
+
+})
+
+
 export {
-    getVideoComments }
+    getVideoComments,
+    addComment }
