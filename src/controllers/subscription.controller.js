@@ -80,7 +80,50 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 })
 
 
+const getSubscribedChannels = asyncHandler(async (req, res) => {
+    const { subscriberId } = req.params
+
+    try {
+        // fetch channel list for the given subscriber
+        const subscribedChannels = await Subscription.aggregate([
+            {
+                $match: { subscriber: mongoose.Types.ObjectId(subscriberId) }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'channel',
+                    foreignField: '_id',
+                    as: 'channelDetails'
+                }
+            },
+            {
+                $unwind: '$channelDetails'
+            },
+            {
+                $project: {
+                    channel: {
+                        username: 1,
+                        fullname: 1,
+                        avatar:1
+                    }
+                }
+            }
+        ])
+
+        res.status(200).json(
+            new ApiResponse(200, subscribedChannels, 'Subscribed channels fetched successfully')
+        )
+
+    } catch (error) {
+        throw new ApiError(500, 'Error fetching subscribed channels')
+    }
+})
+
+
+
 export {
     toggleSubscription,
-    getUserChannelSubscribers
+    getUserChannelSubscribers,
+    getSubscribedChannels
 }
