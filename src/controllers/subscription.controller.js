@@ -6,6 +6,7 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 
+/*** Route handler for toggling subscription ***/
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params
     const { _id: subscriberId } = req.user
@@ -43,6 +44,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for getting subscriber list for a channel***/
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
 
@@ -80,6 +82,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for finding subscribed channels for a given subscriber***/
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params
 
