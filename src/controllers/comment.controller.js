@@ -75,6 +75,33 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for updating a comment ***/
+const updateComment = asyncHandler(async (req, res) => {
+    const {commentId} = req.params
+    const {content} = req.body
+
+    const comment = await Comment.findById(commentId);
+
+    if(!comment) {
+        throw new ApiError(404, "Comment does not exist")
+    }
+
+    // check if the user is the owner of the comment
+    if (comment.owner.toString() !== userId.toString()) {
+        throw new ApiError(404, "You are not authorized to update this comment")
+    }
+
+    comment.content = content
+    await comment.save()
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, comment, "Comment updated successfully")
+    )
+})
+
+
 export {
     getVideoComments,
-    addComment }
+    addComment,
+    updateComment }
