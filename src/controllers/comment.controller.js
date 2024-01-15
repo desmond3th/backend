@@ -94,6 +94,7 @@ const updateComment = asyncHandler(async (req, res) => {
     comment.content = content
     await comment.save()
 
+
     return res.status(200)
     .json(
         new ApiResponse(200, comment, "Comment updated successfully")
@@ -101,7 +102,25 @@ const updateComment = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for deleting a comment ***/
+const deleteComment = asyncHandler(async (req, res) => {
+    const {commentId} = req.params
+
+    const comment = await Comment.findOneAndDelete(commentId)
+
+    if(!comment) {
+        throw new ApiError(400, "Failed to delete the comment")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, null, "Comment successfully deleted")
+    )
+})
+
+
 export {
     getVideoComments,
     addComment,
-    updateComment }
+    updateComment,
+    deleteComment }
