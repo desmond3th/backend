@@ -28,7 +28,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
             }
         },
         {
-            $unwind: $ownerDetails
+            $unwind: '$ownerDetails'
         },
         {
             $project : {
