@@ -25,5 +25,29 @@ const createPlaylist = asyncHandler(async (req, res) => {
     )
 })
 
+
+/*** Route handler for adding video to a playlist ***/
+const addVideoToPlaylist = asyncHandler(async (req, res) => {
+    const {playlistId, videoId} = req.params
+
+    if(!videoId) {
+        throw new ApiError(400, "video not found")
+    }
+
+    const playlist = await Playlist.findByIdAndUpdate( playlistId, 
+        {
+            $push: {videos: videoId}
+        }, 
+        {new : true} 
+    )
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, playlist, "Video added to the playlist")
+    )
+})
+
+
 export {
-    createPlaylist,}
+    createPlaylist,
+    addVideoToPlaylist}
