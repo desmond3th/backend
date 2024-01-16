@@ -74,8 +74,31 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for accessing user tweets ***/
+const getUserTweets = asyncHandler(async (req, res) => {
+    const {userId} = req.params
+    
+    const user = await User.findById(userId)
+
+    if(!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    const tweets = await Tweet.aggregate([
+        { 
+            $match : { owner : mongoose.Types.ObjectId(userId) }
+        }
+    ])
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, tweets, "Tweets fethched successfully")
+    )
+})
+
 
 export {
     createTweet,
     deleteTweet,
-    updateTweet,}
+    updateTweet,
+    getUserTweets }
