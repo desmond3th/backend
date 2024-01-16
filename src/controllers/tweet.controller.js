@@ -14,7 +14,7 @@ const createTweet = asyncHandler(async (req, res) => {
     const user = await User.findById(userID)
 
     if(!user) {
-        throw new ApiError(400, "You are not authorized to post a tweet") 
+        throw new ApiError(403, "You are not authorized to post a tweet") 
     }
 
     const tweet = await Tweet.create({
@@ -40,7 +40,9 @@ const deleteTweet = asyncHandler(async (req, res) => {
     }
 
     return res.status(200)
-    .json(200, null, "Tweet successfully deleted")
+    .json(
+        new ApiResponse (200, null, "Tweet successfully deleted")
+    )
 })
 
 
@@ -53,7 +55,7 @@ const updateTweet = asyncHandler(async (req, res) => {
     const tweet = await Tweet.findById(tweetId)
 
     if(!tweet) {
-        throw new ApiError(404, "Tweet not found")
+        throw new ApiError(400, "Tweet not found")
     }
 
     // check if the user is the owner of the tweet
@@ -72,8 +74,8 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 
+
 export {
     createTweet,
     deleteTweet,
-    updateTweet, }
-
+    updateTweet,}
