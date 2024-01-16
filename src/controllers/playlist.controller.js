@@ -48,6 +48,29 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for removing video from playlist ***/
+const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+    const {playlistId, videoId} = req.params
+
+    if(!videoId) {
+        throw new ApiError(400, "video not found")
+    }
+
+    const playlist = await Playlist.findByIdAndUpdate( playlistId,
+        {
+            $pull : {videos: videoId}
+        },
+        {new : true}
+    )
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, playlist, "video removed from playlist")
+    )
+})
+
+
 export {
     createPlaylist,
-    addVideoToPlaylist}
+    addVideoToPlaylist,}
+    removeVideoFromPlaylist
