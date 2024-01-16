@@ -29,6 +29,22 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for deleting a tweet ***/
+const deleteTweet = asyncHandler(async (req, res) => {
+    const {tweetId} = req.params
+
+    const tweet = await Tweet.findOneAndDelete({ _id: tweetId })
+
+    if(!tweet) {
+        throw new ApiError(400, "Failed to delete a tweet")
+    }
+
+    return res.status(200)
+    .json(200, null, "Tweet successfully deleted")
+})
+
+
 export {
-    createTweet }
+    createTweet,
+    deleteTweet, }
 

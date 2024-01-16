@@ -106,7 +106,7 @@ const updateComment = asyncHandler(async (req, res) => {
 const deleteComment = asyncHandler(async (req, res) => {
     const {commentId} = req.params
 
-    const comment = await Comment.findOneAndDelete(commentId)
+    const comment = await Comment.findOneAndDelete({ _id: commentId })
 
     if(!comment) {
         throw new ApiError(400, "Failed to delete the comment")
