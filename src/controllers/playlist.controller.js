@@ -187,10 +187,60 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for accessing playlist ***/
+const getPlaylistById = asyncHandler(async (req, res) => {
+    const {playlistId} = req.params
+
+    const playlist = await Playlist.aggregate([
+        {
+            $match : {_id : mongoose.Types.ObjectId(playlistId)}
+        },
+        {
+            $lookup : {
+                from : 'videos',
+                localField: 'videos',
+                foreignField: '_id',
+                as: 'videoDetails'
+            }
+        },
+        {
+            $project :{
+                name : 1,
+                description: 1,
+                videos : {
+                    $map : {
+                        $input : '$videoDetails',
+                        $as : 'video',
+                        $in : {
+                            title: '$$video.title',
+                            description: '$$video.description',
+                            videoFile: '$$video.videoFile',
+                            thumbnail: '$$video.thumbnail',
+                            duration: '$$video.duration',
+                            views : '$$video.views'
+                        }
+                    }
+                }
+            }
+        }
+    ])
+
+    if (playlist.length === 0) {
+        throw new ApiError(404, "Playlist not found");
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, playlist, "Playlist fetched successfully")
+    )
+})
+
+
 export {
     createPlaylist,
     addVideoToPlaylist,
     removeVideoFromPlaylist,
     updatePlaylist,
     deletePlaylist,
-    getUserPlaylists, }
+    getUserPlaylists,
+    getPlaylistById }
