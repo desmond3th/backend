@@ -102,8 +102,30 @@ const updatePlaylist = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for deleting playlist ***/
+const deletePlaylist = asyncHandler(async (req, res) => {
+    const {playlistId} = req.params
+
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Invalid id");
+    }
+
+    const playlist = await Playlist.findOneAndDelete({ _id : playlistId})
+
+    if(!playlist) {
+        throw new ApiError(400, "Failed to delete the playlist")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, null, "Playlist successfully deleted")
+    )
+})
+
+
 export {
     createPlaylist,
     addVideoToPlaylist,
     removeVideoFromPlaylist,
-    updatePlaylist,}
+    updatePlaylist,
+    deletePlaylist,}
