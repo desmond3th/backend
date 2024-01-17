@@ -30,7 +30,9 @@ const createPlaylist = asyncHandler(async (req, res) => {
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
 
-    if(!videoId) {
+    const video = await Playlist.findById(videoId);
+
+    if(!video) {
         throw new ApiError(400, "video not found")
     }
 
@@ -52,8 +54,8 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
 
-    if(!videoId) {
-        throw new ApiError(400, "video not found")
+    if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid id");
     }
 
     const playlist = await Playlist.findByIdAndUpdate( playlistId,
@@ -70,7 +72,38 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for updating the playlist ***/
+const updatePlaylist = asyncHandler(async (req, res) => {
+    const {playlistId} = req.params
+    const {name, description} = req.body
+
+    if(!name || !description) {
+        throw new ApiError(400, "name or description is required")
+    }
+
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Invalid playlist id");
+    }
+
+    const playlist = await Playlist.findByIdAndUpdate( playlistId, 
+        {
+            $set : {
+                name,
+                description
+            }
+        },
+        {new : true}
+    )
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, playlist, "updated playlist")
+    )
+})
+
+
 export {
     createPlaylist,
-    addVideoToPlaylist,}
-    removeVideoFromPlaylist
+    addVideoToPlaylist,
+    removeVideoFromPlaylist,
+    updatePlaylist,}
