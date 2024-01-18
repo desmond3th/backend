@@ -64,6 +64,38 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 })
 
 
+/*** Route handler for toggling like on a tweet ***/
+const toggleTweetLike = asyncHandler(async (req, res) => {
+    const {tweetId} = req.params
+
+    if(!isValidObjectId(tweetId)) {
+        throw new ApiError(400, "Invalid tweet id")
+    }
+
+    try {
+        
+        const existingLike = await Like.findOneAndDelete({tweet : tweetId, likedBy : req.user._id})
+
+        if(!existingLike) {
+            await Like.create({tweet: tweetId, likedBy: req.user._id})
+        }
+
+        const likeCount = await Like.countDocuments({tweet: tweetId}).lean()
+
+        return res.status(200)
+        .json(
+            new ApiResponse(200, {
+                likeCount: likeCount.toString(), 
+                userLiked: existingLike !== null
+            }, "Tweet like status updated successfully")
+        )
+
+    } catch (error) {
+        throw new ApiError(400, "Faile to toggle like status for tweet")
+    }
+})
+
 export {
     toggleVideoLike,
-    toggleCommentLike}
+    toggleCommentLike,
+    toggleTweetLike}
