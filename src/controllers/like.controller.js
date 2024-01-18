@@ -95,7 +95,51 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     }
 })
 
+
+/*** Route handler for getting all the liked videos ***/
+const getLikedVideos = asyncHandler(async (req, res) => {
+    const userId = req.user._id
+
+    try {
+        const likedVideos = await Like.aggregate([
+            {
+                $match: {
+                    likedBy: mongoose.Types.ObjectId(userId),
+                    video: { $exists: true }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'videos',
+                    localField: 'video',
+                    foreignField: '_id',
+                    as: 'videoDetails'
+                }
+            },
+            {
+                $addFields: {
+                    videoDetails: {
+                        $arrayElemAt: ['$videoDetails', 0]
+                    }
+                }
+            }
+        ]);
+
+        if(likedVideos.length === 0) {
+            throw new ApiError(400, "No liked videos were found")
+        }
+
+        return res.status(200).json(
+            new ApiResponse(200, likedVideos, "Liked videos fetched successfully")
+        )
+
+    } catch (error) {
+        throw new ApiError(500, "Failed to retrieve liked videos");
+    }
+})
+
 export {
     toggleVideoLike,
     toggleCommentLike,
-    toggleTweetLike}
+    toggleTweetLike,
+    getLikedVideos }
