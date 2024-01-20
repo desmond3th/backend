@@ -9,7 +9,6 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 
 /*** Route handler for getting channel stats ***/
 const getChannelStats = asyncHandler(async (req, res) => {
-    // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
 
     const totalSubs = await Subscription.aggregate([
         {
@@ -42,13 +41,27 @@ const getChannelStats = asyncHandler(async (req, res) => {
         },
     ])
 
+    const totalLikes = await Like.aggregate([
+        {
+            $match: { _id : mongoose.Types.ObjectId(req.user._id) },
+        },
+        {
+            $group : {
+                _id : null,
+                totalLikes : {
+                    $sum : 1
+                },
+            },
+        },
+    ])
+
     if(totalViewsAndTotalVideos.length() === 0) {
         return res.status(200)
         .json(
             new ApiResponse(200, {}, "No videos are there on this channel") )
     }
 
-    const channelStats = {totalSubs, totalViewsAndTotalVideos}
+    const channelStats = {totalSubs, totalViewsAndTotalVideos, totalLikes}
     
     return res.status(200)
     .json(
