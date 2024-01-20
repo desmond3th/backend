@@ -12,12 +12,12 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
     const totalSubs = await Subscription.aggregate([
         {
-            $match: { _id : mongoose.Types.ObjectId(req.user._id) },
+            $match: { channel : mongoose.Types.ObjectId(req.user._id) },
         },
         {
             $group : {
                 _id : '$channel',
-                subscriberCount : {
+                subscribersCount : {
                     $sum : 1
                 }
             },
@@ -26,7 +26,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
     const totalViewsAndTotalVideos = await Video.aggregate([
         {
-            $match : { _id : mongoose.Types.ObjectId(req.user._id) },
+            $match : { owner : mongoose.Types.ObjectId(req.user._id) },
         },
         {
             $group : {
@@ -43,33 +43,37 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
     const totalLikes = await Like.aggregate([
         {
-            $match: { _id : mongoose.Types.ObjectId(req.user._id) },
+            $match: { likedBy : mongoose.Types.ObjectId(req.user._id) },
         },
         {
             $group : {
                 _id : null,
-                totalLikes : {
+                likesCount : {
                     $sum : 1
                 },
             },
         },
     ])
 
-    if(totalViewsAndTotalVideos.length() === 0) {
+    if(totalViewsAndTotalVideos.length === 0) {
         return res.status(200)
         .json(
             new ApiResponse(200, {}, "No videos are there on this channel") )
     }
 
-    const channelStats = {totalSubs, totalViewsAndTotalVideos, totalLikes}
-    
+    const channelStats = {
+        totalSubs: totalSubs[0]?.subscribersCount || 0,
+        totalViews: totalViewsAndTotalVideos[0]?.totalViews || 0,
+        totalVideos: totalViewsAndTotalVideos[0]?.totalVideos || 0,
+        totalLikes: totalLikes[0]?.likesCount || 0,
+    }
+
     return res.status(200)
     .json(
         new ApiResponse(201, channelStats, "Channel Stats fetched successfully")
     )
 
 })
-
 
 export {
     getChannelStats,}
