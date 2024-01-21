@@ -65,7 +65,7 @@ npm run dev
 - [MongoDB](https://www.mongodb.com/) - Database
 - [Express](https://expressjs.com/) - Server Framework
 - [NodeJs](https://nodejs.org/en/) - Server Environment
-- [Cloudinary](https://nodejs.org/en/) - Cloud
+- [Cloudinary](https://cloudinary.com/) - Cloud
 
 
 ## ✍️ Author
