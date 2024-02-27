@@ -4,6 +4,8 @@ import { loginUser, logoutUser, regUser, refreshAccessToken, changePassword, get
             getWatchHistory, deleteUserChannel} from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { userLoginValidator, userRegisterValidator } from "../validators/user.validator.js";
+import { validate } from "../validators/validator.js";
 
 const route = Router()
 
@@ -19,9 +21,9 @@ route.route("/register").post(
             maxCount: 1
         }
     ]),
-    regUser) // make sure to send the POST status.
+    userRegisterValidator(), validate, regUser) // make sure to send the POST status.
 
-route.route("/login").post(loginUser)
+route.route("/login").post(userLoginValidator(), validate, loginUser)
 
 route.route("/logout").post(verifyJWT, logoutUser)
 route.route("/refresh-token").post(refreshAccessToken)
