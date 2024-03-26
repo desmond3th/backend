@@ -1,4 +1,4 @@
-# Watchify Backend Oasis
+# Watchify
 
 ## 📝 Table of Contents
 
@@ -8,7 +8,7 @@
 
 ## 🧐 About
 
-Welcome to Watchify Backend Oasis – a robust backend solution providing essential features for video uploading and storage built with nodejs, expressjs, mongodb, mongoose, jwt, bcrypt, etc. This RESTful API is designed to handle:
+Welcome to Watchify – a robust backend solution providing essential features for video uploading and storage built with nodejs, expressjs, mongodb, mongoose, jwt, bcrypt, etc. This RESTful API is designed to handle:
 
 - **User Authentication:** Secure account creation, login, and identity verification.
 - **Video Management:** Seamless video uploading and storage.
